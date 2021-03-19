@@ -1,0 +1,55 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: etcd-backup
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - command:
+            - /bin/sh
+            - /scripts/backup.sh
+            image: changeme
+            imagePullPolicy: IfNotPresent
+            name: backup-etcd
+            env:
+            - name: OCP_BACKUP_KEEP_DAYS
+              valueFrom:
+                configMapKeyRef:
+                  name: backup-config
+                  key: backup.keepdays
+            resources: {}
+            securityContext:
+              privileged: true
+              runAsUser: 0
+            volumeMounts:
+            - mountPath: /host
+              name: host
+            - name: scripts
+              mountPath: /scripts
+            - name: volume-backup
+              mountPath: /backup
+          nodeSelector:
+            node-role.kubernetes.io/master: ""
+          tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/master
+          hostNetwork: true
+          hostPID: true
+          serviceAccountName: etcd-backup
+          restartPolicy: Never
+          dnsPolicy: ClusterFirst
+          volumes:
+          - hostPath:
+              path: /
+              type: Directory
+            name: host
+          - name: scripts
+            configMap:
+              name: backup-script
+          - name: volume-backup
+            persistentVolumeClaim:
+              claimName: etcd-backup-pvc
