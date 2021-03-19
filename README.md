@@ -49,14 +49,14 @@ toolsImage=$(oc adm release info --image-for=tools --registry-config=./pull-secr
 oc create -f backup-cronjob.yaml
 
 # adjust the tools image
-oc patch cronjob/ocp-etcd-backup -p "{\"spec\":{\"jobTemplate\":{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"image\":\"${toolsImage}\",\"name\":\"backup-etcd\"}]}}}}}}'"
+oc patch cronjob/etcd-backup -p "{\"spec\":{\"jobTemplate\":{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"image\":\"${toolsImage}\",\"name\":\"backup-etcd\"}]}}}}}}'"
 ```
 
 ## Testing
 
 To test the backup, you can run a job and verify its logs
 ```
-oc create job --from=cronjob/ocp-etcd-backup etcd-manual-backup-001
+oc create job --from=cronjob/etcd-backup etcd-manual-backup-001
 oc logs -l job-name=etcd-manual-backup-001
 ```
 Then check on your Storage, if the files are there as excepted.
@@ -70,12 +70,13 @@ oc edit -n etcd-backup cm/backup-config
 ```
 
 The following options are used:
-* `backup.keepdays`: days to keep the backup
+* `backup.keepdays`: Days to keep the backup. Please note, that the number does not get validated.
 
-Changing can be done in the CronJob directly, with `spec:schedule`:
+Changing the schedule be done in the CronJob directly, with `spec.schedule`:
 ```
 oc edit -n etcd-backup cronjob/etcd-backup
 ```
+Default is `0 0 * * *` which means the cronjob runs one time a day at midnight.
 
 
 ## Update
@@ -92,7 +93,7 @@ toolsImage=$(oc adm release info --image-for=tools)
 toolsImage=$(oc adm release info --image-for=tools --registry-config=./pull-secret.json)
 
 # adjust the tools image
-oc patch cronjob/ocp-etcd-backup -p "{\"spec\":{\"jobTemplate\":{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"image\":\"${toolsImage}\",\"name\":\"backup-etcd\"}]}}}}}}'"
+oc patch cronjob/etcd-backup -p "{\"spec\":{\"jobTemplate\":{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"image\":\"${toolsImage}\",\"name\":\"backup-etcd\"}]}}}}}}'"
 ```
 
 
