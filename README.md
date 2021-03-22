@@ -14,7 +14,7 @@ The .db file is a snapshot of the etcd and the .tar.gz contains the static pods 
 
 Fist, create a namespace:
 ```
-# oc new-project etcd-backup
+oc new-project etcd-backup
 ```
 
 Since the container needs to be privileged, add the reqired RBAC rules:
@@ -24,12 +24,12 @@ oc create -f backup-rbac.yaml
 
 Then create a configmap with the backup-script:
 ```
-# oc create configmap backup-script --from-file=backup.sh
+oc create configmap backup-script --from-file=backup.sh
 ```
 
 Then adjust storage to your needs in `backup-storage.yaml` and deploy it. The example uses NFS but you can use any storage class you want.
 ```
-# oc create -f backup-storage.yaml
+oc create -f backup-storage.yaml
 ```
 
 Configure the backup-script (for now only retention in days can be configured in the)
@@ -61,7 +61,7 @@ oc logs -l job-name=etcd-manual-backup-001
 ```
 Then check on your Storage, if the files are there as excepted.
 
-## Change configuration
+## Configuration
 
 Configuration can be changed in configmap `backup-config`:
 
@@ -70,7 +70,13 @@ oc edit -n etcd-backup cm/backup-config
 ```
 
 The following options are used:
-* `backup.keepdays`: Days to keep the backup. Please note, that the number does not get validated.
+* `backup.subdir`: Sub directory on PVC. If it not exists it will be created.
+* `backup.dirname`: Dirname of singe backup. This is a string which run trough
+[`date`](https://man7.org/linux/man-pages/man1/date.1.html)
+* `backup.expiretype`: Can be one of `days` `count`. If `days` are set, `backup.keepdays` is used to determine how long to keep the backups, if `count`, `backup.keepcount` is used to determine how much backups are kept.
+* `backup.keepdays`: Days to keep the backup. Only used if `backup.expiretype` is set to `days`
+* `backup.keepcount`: Number of backups to keep. Only used if `backup.expiretype` is set to `count`
+
 
 Changing the schedule be done in the CronJob directly, with `spec.schedule`:
 ```
@@ -97,5 +103,5 @@ oc patch cronjob/etcd-backup -p "{\"spec\":{\"jobTemplate\":{\"spec\":{\"templat
 ```
 
 
-# References
+## References
 * https://docs.openshift.com/container-platform/4.7/backup_and_restore/backing-up-etcd.html

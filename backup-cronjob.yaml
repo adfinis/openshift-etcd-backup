@@ -21,6 +21,26 @@ spec:
                 configMapKeyRef:
                   name: backup-config
                   key: backup.keepdays
+            - name: OCP_BACKUP_KEEP_COUNT
+              valueFrom:
+                configMapKeyRef:
+                  name: backup-config
+                  key: backup.keepcount
+            - name: OCP_BACKUP_EXPIRE_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: backup-config
+                  key: backup.expiretype
+            - name: OCP_BACKUP_SUBDIR
+              valueFrom:
+                configMapKeyRef:
+                  name: backup-config
+                  key: backup.subdir
+            - name: OCP_BACKUP_DIRNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: backup-config
+                  key: backup.dirname
             resources: {}
             securityContext:
               privileged: true
