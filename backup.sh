@@ -22,7 +22,7 @@ else
 fi
 
 # make dirname and cleanup paths
-BACKUP_FOLDER=$( date "${OCP_BACKUP_DIRNAME}") || echo "Invalid backup.dirname"
+BACKUP_FOLDER=$( date "${OCP_BACKUP_DIRNAME}") || { echo "Invalid backup.dirname" && exit 1; }
 BACKUP_PATH=$( realpath -m "${OCP_BACKUP_SUBDIR}/${BACKUP_FOLDER}" )
 BACKUP_PATH_POD=$( realpath -m "/backup/${BACKUP_PATH}" )
 BACKUP_ROOTPATH=$( realpath -m "/backup/${OCP_BACKUP_SUBDIR}" )
