@@ -75,15 +75,15 @@ oc edit -n etcd-backup cm/backup-config
 ```
 
 The following options are used:
-* `backup.subdir`: Sub directory on PVC. If it not exists it will be created.
-* `backup.dirname`: Dirname of singe backup. This is a string which run trough
+- `backup.subdir`: Sub directory on PVC. If it not exists it will be created.
+- `backup.dirname`: Dirname of singe backup. This is a string which run trough
 [`date`](https://man7.org/linux/man-pages/man1/date.1.html)
-* `backup.expiretype`:
-** `days`: Keep backups newer than `backup.keepdays`.
-** `count`: Keep a number of backups. `backup.keepcount` is used to determine how much.
-** `never`: Dont expire backups, keep all of them.
-* `backup.keepdays`: Days to keep the backup. Only used if `backup.expiretype` is set to `days`
-* `backup.keepcount`: Number of backups to keep. Only used if `backup.expiretype` is set to `count`
+- `backup.expiretype`:
+  - `days`: Keep backups newer than `backup.keepdays`.
+  - `count`: Keep a number of backups. `backup.keepcount` is used to determine how much.
+  - `never`: Dont expire backups, keep all of them.
+- `backup.keepdays`: Days to keep the backup. Only used if `backup.expiretype` is set to `days`
+- `backup.keepcount`: Number of backups to keep. Only used if `backup.expiretype` is set to `count`
 
 
 Changing the schedule be done in the CronJob directly, with `spec.schedule`:
