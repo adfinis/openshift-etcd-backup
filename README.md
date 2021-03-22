@@ -1,13 +1,13 @@
 # OpenShift etcd backup CronJob
 
-Openshift 4 backup
-The Openshift 4 backup generates 2 different files with the date when it was performed.
+This CronJob creates an POD which runs `/usr/local/bin/cluster-backup.sh` on a master-node to create the described backup. After finishing, it copies the files to an configured PV and expires old backups according to its configuration.
+
+The OpenShift 4 backup generates 2 different files with the date when it is performed:
 
 - snapshot_2021-03-17_153108.db
-- static_kuberesources_2021-03-15_153108.tar.gz
+- static_kuberesources_2021-03-17_153108.tar.gz
 
-The .db file is a snapshot of the etcd and the .tar.gz contains the static pods of the control plane (etcd, api server, controller manager and scheduler) with their respective certificates and private keys. The backup that is made in a master contains the information of all masters, so it is only necessary to make it in a single master.
-
+The .db file is a snapshot of the etcd and the .tar.gz contains the static pods of the control plane (etcd, api server, controller manager and scheduler) with their respective certificates and private keys. Those files are put in an seperate directory on the PV per backup run.
 
 
 ## Installation
@@ -52,12 +52,17 @@ oc create -f backup-cronjob.yaml
 oc patch cronjob/etcd-backup -p "{\"spec\":{\"jobTemplate\":{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"image\":\"${toolsImage}\",\"name\":\"backup-etcd\"}]}}}}}}'"
 ```
 
-## Testing
+## Creating manual backup / testing
 
-To test the backup, you can run a job and verify its logs
+To test the backup, or create an manual backup, you can run a job:
 ```
-oc create job --from=cronjob/etcd-backup etcd-manual-backup-001
-oc logs -l job-name=etcd-manual-backup-001
+backupName=$(date "+etcd-backup-manual-%F-%H-%M-%S")
+oc create job --from=cronjob/etcd-backup ${backupName}
+```
+
+To see if everything works as it should, you can check the logs:
+```
+oc logs -l job-name=${backupName}
 ```
 Then check on your Storage, if the files are there as excepted.
 
