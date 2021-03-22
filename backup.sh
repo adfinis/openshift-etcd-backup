@@ -4,8 +4,8 @@ set -xeuo pipefail
 
 # validate expire type
 case "${OCP_BACKUP_EXPIRE_TYPE}" in
-    days|count) ;;
-    *) echo "backup.expiretype needs to be one of: days,count"; exit 1 ;;
+    days|count|never) ;;
+    *) echo "backup.expiretype needs to be one of: days,count,never"; exit 1 ;;
 esac
 
 # validate  expire numbers
@@ -14,7 +14,7 @@ if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ]; then
     ''|*[!0-9]*) echo "backup.expiredays needs to be a valid number"; exit 1 ;;
     *) ;;
   esac
-else
+elif [ "${OCP_BACKUP_EXPIRE_TYPE}" = "count" ]; then
   case "${OCP_BACKUP_KEEP_COUNT}" in
     ''|*[!0-9]*) echo "backup.expirecount needs to be a valid number"; exit 1 ;;
     *) ;;
@@ -41,6 +41,6 @@ rm -f /host/tmp/etcd-backup/*
 # expire backup
 if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ]; then
   find ${BACKUP_ROOTPATH} -mindepth 1 -maxdepth 1 -daystart -type d -mtime +${OCP_BACKUP_KEEP_DAYS} -exec rm -rv {} +
-else
+elif [ "${OCP_BACKUP_EXPIRE_TYPE}" = "count" ]; then
   ls -1tp ${BACKUP_ROOTPATH} | awk "NR>${OCP_BACKUP_KEEP_COUNT}" | xargs -I{} rm -rv ${BACKUP_ROOTPATH}/{}
 fi
