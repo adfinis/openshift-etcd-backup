@@ -3,6 +3,7 @@ kind: PersistentVolume
 metadata:
   name: etcd-backup-pv
 spec:
+  persistentVolumeReclaimPolicy: Retain
   accessModes:
     - ReadWriteMany
   nfs:
