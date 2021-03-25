@@ -50,25 +50,25 @@ elif [ "${OCP_BACKUP_EXPIRE_TYPE}" = "count" ]; then
 fi
 
 # make dirname and cleanup paths
-BACKUP_FOLDER=$( date "${OCP_BACKUP_DIRNAME}") || { echo "Invalid backup.dirname" && exit 1; }
-BACKUP_PATH=$( realpath -m "${OCP_BACKUP_SUBDIR}/${BACKUP_FOLDER}" )
-BACKUP_PATH_POD=$( realpath -m "/backup/${BACKUP_PATH}" )
-BACKUP_ROOTPATH=$( realpath -m "/backup/${OCP_BACKUP_SUBDIR}" )
+BACKUP_FOLDER="$( date "${OCP_BACKUP_DIRNAME}")" || { echo "Invalid backup.dirname" && exit 1; }
+BACKUP_PATH="$( realpath -m "${OCP_BACKUP_SUBDIR}/${BACKUP_FOLDER}" )"
+BACKUP_PATH_POD="$( realpath -m "/backup/${BACKUP_PATH}" )"
+BACKUP_ROOTPATH="$( realpath -m "/backup/${OCP_BACKUP_SUBDIR}" )"
 
 # make nescesary directorys
-mkdir -p "/host/tmp/etcd-backup"
+mkdir -p "/host/var/tmp/etcd-backup"
 mkdir -p "${BACKUP_PATH_POD}"
 
 # create backup to temporary location
-chroot /host /usr/local/bin/cluster-backup.sh /tmp/etcd-backup
+chroot /host /usr/local/bin/cluster-backup.sh /var/tmp/etcd-backup
 
 # move files to pvc and delete temporary files
-cp -rp /host/tmp/etcd-backup/* ${BACKUP_PATH_POD}
-rm -f /host/tmp/etcd-backup/*
+mv /host/var/tmp/etcd-backup/* "${BACKUP_PATH_POD}"
+rm -rv /host/var/tmp/etcd-backup
 
 # expire backup
 if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ]; then
-  find ${BACKUP_ROOTPATH} -mindepth 1 -maxdepth 1 -daystart -type d -mtime +${OCP_BACKUP_KEEP_DAYS} -exec rm -rv {} +
+  find "${BACKUP_ROOTPATH}" -mindepth 1 -maxdepth 1  -type d -mtime "+${OCP_BACKUP_KEEP_DAYS}" -exec rm -rv {} +
 elif [ "${OCP_BACKUP_EXPIRE_TYPE}" = "count" ]; then
-  ls -1tp ${BACKUP_ROOTPATH} | awk "NR>${OCP_BACKUP_KEEP_COUNT}" | xargs -I{} rm -rv ${BACKUP_ROOTPATH}/{}
+  ls -1tp "${BACKUP_ROOTPATH}" | awk "NR>${OCP_BACKUP_KEEP_COUNT}" | xargs -I{} rm -rv "${BACKUP_ROOTPATH}/{}"
 fi
