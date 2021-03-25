@@ -11,6 +11,9 @@ spec:
     path: "/etcd-backup"
   capacity:
     storage: 10Gi
+  claimRef:
+    name: etcd-backup-pvc
+    namespace: etcd-backup
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
