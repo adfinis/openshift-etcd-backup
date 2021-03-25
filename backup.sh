@@ -10,7 +10,7 @@ esac
 
 # validate  expire numbers
 if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ]; then
-  case ${OCP_BACKUP_KEEP_DAYS} in
+  case "${OCP_BACKUP_KEEP_DAYS}" in
     ''|*[!0-9]*) echo "backup.expiredays needs to be a valid number"; exit 1 ;;
     *) ;;
   esac
