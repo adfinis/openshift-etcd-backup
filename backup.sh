@@ -4,7 +4,7 @@
 ################################################################################
 #
 # Copyright (C) 2021 Adfinis AG
-#                    https://adfinis-sygroup.ch
+#                    https://adfinis.com
 #                    info@adfinis.com
 #
 # This program is free software: you can redistribute it and/or
@@ -25,7 +25,7 @@
 # https://github.com/adfinis-sygroup/openshift-etcd-backup
 #
 # Authors:
-#  Christian Affolter <cyrill.vonwattenwyl@adfinis.com>
+#  Cyrill von Wattenwyl <cyrill.vonwattenwyl@adfinis.com>
 
 
 set -xeuo pipefail
