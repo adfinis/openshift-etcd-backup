@@ -13,44 +13,18 @@ spec:
           - command:
             - /bin/sh
             - /scripts/backup.sh
-            image: changeme
-            imagePullPolicy: IfNotPresent
+            image: ghcr.io/adfinis-adsygroup/openshift-etcd-backup
+            imagePullPolicy: Always
             name: backup-etcd
-            env:
-            - name: OCP_BACKUP_KEEP_DAYS
-              valueFrom:
-                configMapKeyRef:
-                  name: backup-config
-                  key: backup.keepdays
-            - name: OCP_BACKUP_KEEP_COUNT
-              valueFrom:
-                configMapKeyRef:
-                  name: backup-config
-                  key: backup.keepcount
-            - name: OCP_BACKUP_EXPIRE_TYPE
-              valueFrom:
-                configMapKeyRef:
-                  name: backup-config
-                  key: backup.expiretype
-            - name: OCP_BACKUP_SUBDIR
-              valueFrom:
-                configMapKeyRef:
-                  name: backup-config
-                  key: backup.subdir
-            - name: OCP_BACKUP_DIRNAME
-              valueFrom:
-                configMapKeyRef:
-                  name: backup-config
-                  key: backup.dirname
-            resources: {}
+            envFrom:
+            - configMapRef:
+                name: backup-config
             securityContext:
               privileged: true
               runAsUser: 0
             volumeMounts:
             - mountPath: /host
               name: host
-            - name: scripts
-              mountPath: /scripts
             - name: volume-backup
               mountPath: /backup
           nodeSelector:
@@ -68,9 +42,6 @@ spec:
               path: /
               type: Directory
             name: host
-          - name: scripts
-            configMap:
-              name: backup-script
           - name: volume-backup
             persistentVolumeClaim:
               claimName: etcd-backup-pvc
