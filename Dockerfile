@@ -1,12 +1,10 @@
-FROM registry.access.redhat.com/ubi8@sha256:77623387101abefbf83161c7d5a0378379d0424b2244009282acb39d42f1fe13
+FROM registry.access.redhat.com/ubi8-minimal@sha256:0ccb9988abbc72d383258d58a7f519a10b637d472f28fbca6eb5fab79ba82a6b
 
 LABEL org.opencontainers.image.authors="Adfinis AG <https://adfinis.com>"
 LABEL org.opencontainers.image.vendor="Adfinis"
 
-RUN mkdir /scripts
+COPY backup.sh /usr/local/bin/backup.sh
 
-ADD backup.sh /scripts
+RUN microdnf install findutils -y && microdnf clean all
 
-RUN chmod +x /scripts/backup.sh
-
-CMD ["/scripts/backup.sh"]
+CMD ["/usr/local/bin/backup.sh"]
