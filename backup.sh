@@ -70,5 +70,6 @@ rm -rv /host/var/tmp/etcd-backup
 if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ]; then
   find "${BACKUP_ROOTPATH}" -mindepth 1 -maxdepth 1  -type d -mtime "+${OCP_BACKUP_KEEP_DAYS}" -exec rm -rv {} +
 elif [ "${OCP_BACKUP_EXPIRE_TYPE}" = "count" ]; then
+  # shellcheck disable=SC3040
   ls -1tp "${BACKUP_ROOTPATH}" | awk "NR>${OCP_BACKUP_KEEP_COUNT}" | xargs -I{} rm -rv "${BACKUP_ROOTPATH}/{}"
 fi
