@@ -30,6 +30,9 @@
 
 set -xeuo pipefail
 
+# set proper umask
+umask "${OCP_BACKUP_UMASK}"
+
 # validate expire type
 case "${OCP_BACKUP_EXPIRE_TYPE}" in
     days|count|never) ;;
