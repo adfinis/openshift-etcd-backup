@@ -80,5 +80,14 @@ Default is `0 0 * * *` which means the cronjob runs one time a day at midnight.
 
 To deploy easily the solution a helm chart is available on upstream Adfinis charts [repository](https://github.com/adfinis-sygroup/helm-charts/tree/master/charts/openshift-etcd-backup).
 
+## Installation
+
+Before installing the chart, feel free to update the `values.yaml` file according to your needs.
+
+```
+helm repo add adfinis https://chart.adfinis.com
+helm install etcd-backup adfinis/openshift-etcd-backup
+```
+
 ## References
 * https://docs.openshift.com/container-platform/4.7/backup_and_restore/backing-up-etcd.html
