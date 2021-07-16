@@ -21,7 +21,7 @@ Since the container needs to be privileged, add the reqired RBAC rules:
 oc create -f backup-rbac.yaml
 ```
 
-Then adjust storage to your needs in `backup-storage.yaml` and deploy it. The example uses NFS but you can use any storage class you want (`hostPath` or `provioning`):
+Then adjust the storage configuration to your needs in `backup-storage.yaml` and deploy it. The example uses NFS but you can use any storage class you want (i.e `hostPath`):
 ```
 oc create -f backup-storage.yaml
 ```
@@ -59,8 +59,8 @@ oc edit -n etcd-backup cm/backup-config
 ```
 
 The following options are used:
-- `OCP_BACKUP_SUBDIR`: Sub directory on PVC. If it not exists it will be created.
-- `OCP_BACKUP_DIRNAME`: Dirname of singe backup. This is a string which run trough
+- `OCP_BACKUP_SUBDIR`: Sub directory on PVC that should be used to store the backup. If it does not exist it will be created.
+- `OCP_BACKUP_DIRNAME`: Directory name for a single backup. This is a format string used by
 [`date`](https://man7.org/linux/man-pages/man1/date.1.html)
 - `OCP_BACKUP_EXPIRE_TYPE`:
   - `days`: Keep backups newer than `backup.keepdays`.
@@ -68,7 +68,7 @@ The following options are used:
   - `never`: Dont expire backups, keep all of them.
 - `OCP_BACKUP_KEEP_DAYS`: Days to keep the backup. Only used if `backup.expiretype` is set to `days`
 - `OCP_BACKUP_KEEP_COUNT`: Number of backups to keep. Only used if `backup.expiretype` is set to `count`
-- `OCP_BACKUP_UMASK`: Umask used inside the script to set proper permission on written files.
+- `OCP_BACKUP_UMASK`: Umask used inside the script to set restrictive permission on written files, as they contain sensitive information.
 
 Changing the schedule be done in the CronJob directly, with `spec.schedule`:
 ```
