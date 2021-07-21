@@ -11,7 +11,7 @@ The `.db` file is a snapshot of the etcd and the archived `.tar.gz` contains the
 
 ## Installation
 
-Fist, create a namespace:
+First, create a namespace:
 ```
 oc new-project etcd-backup
 ```
