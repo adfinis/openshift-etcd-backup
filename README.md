@@ -21,7 +21,7 @@ Since the container needs to be privileged, add the reqired RBAC rules:
 oc create -f backup-rbac.yaml
 ```
 
-Then adjust the storage configuration to your needs in `backup-storage.yaml` and deploy it. The example uses NFS but you can use any storage class you want (i.e `hostPath`):
+Then adjust the storage configuration to your needs in `backup-storage.yaml` and deploy it. The example uses NFS but you can use any storage class you want:
 ```
 oc create -f backup-storage.yaml
 ```
