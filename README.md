@@ -7,7 +7,7 @@ The OpenShift 4 backup generates 2 different files with the date when it is perf
 - snapshot_TIMESTAMP.db
 - static_kuberesources_TIMESTAMP.tar.gz
 
-The `.db` file is a snapshot of the etcd and the archived `.tar.gz` contains the static pods of the control plane (etcd, api server, controller manager and scheduler) with their respective certificates and private keys. Those files are put in an seperate directory on the PV per backup run.
+The `.db` file is a snapshot of the etcd and the archived `.tar.gz` contains the static pods of the control plane (etcd, api server, controller manager and scheduler) with their respective certificates and private keys. Those files are put in a separate directory on the PV per backup run.
 
 ## Installation
 
