@@ -78,7 +78,7 @@ Default is `0 0 * * *` which means the cronjob runs one time a day at midnight.
 
 # Helm chart
 
-To deploy easily the solution a helm chart is available on upstream Adfinis charts [repository](https://github.com/adfinis-sygroup/helm-charts/tree/master/charts/openshift-etcd-backup).
+To easily deploy the solution a helm chart is available on upstream Adfinis charts [repository](https://github.com/adfinis-sygroup/helm-charts/tree/master/charts/openshift-etcd-backup).
 
 ## Installation
 
