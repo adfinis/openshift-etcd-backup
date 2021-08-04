@@ -16,6 +16,13 @@ spec:
             image: ghcr.io/adfinis-adsygroup/openshift-etcd-backup
             imagePullPolicy: Always
             name: backup-etcd
+            resources:
+              requests:
+                cpu: 500m
+                memory: 128Mi
+              limits:
+                cpu: 1000m
+                memory: 512Mi
             envFrom:
             - configMapRef:
                 name: backup-config
