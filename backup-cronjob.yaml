@@ -4,6 +4,7 @@ metadata:
   name: etcd-backup
 spec:
   schedule: "0 0 * * *"
+  startingDeadlineSeconds: 600
   jobTemplate:
     spec:
       backoffLimit: 0
