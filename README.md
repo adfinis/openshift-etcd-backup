@@ -76,6 +76,14 @@ oc edit -n etcd-backup cronjob/etcd-backup
 ```
 Default is `0 0 * * *` which means the cronjob runs one time a day at midnight.
 
+## Monitoring
+
+To be able to get alerts when backups are failing or not being scheduled you can deploy this [PrometheusRule](https://github.com/adfinis-sygroup/openshift-etcd-backup/etcd-backup-cronjob-monitor.PrometheusRule.yaml).
+
+```
+oc create -n etcd-backup -f etcd-backup-cronjob-monitor.PrometheusRule.yaml
+```
+
 # Helm chart
 
 To easily deploy the solution a helm chart is available on upstream Adfinis charts [repository](https://github.com/adfinis-sygroup/helm-charts/tree/master/charts/openshift-etcd-backup).
