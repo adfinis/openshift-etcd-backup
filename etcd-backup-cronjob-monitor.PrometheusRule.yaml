@@ -3,7 +3,6 @@
 # This PrometheusRule alerts if a etcd-backup job has failed or was not scheduled.
 #
 # For detailed explanation on how it works, please see:
-# https://web.archive.org/web/20210805112400/https://www.giffgaff.io/tech/monitoring-kubernetes-jobs
 # https://wiki.adfinis.com/adsy/index.php/RedHat/OpenShift_Container_Platform/BackupRestore/etcd-backup_4.7#Monitoring
 # https://wiki.adfinis.com/adsy/index.php/Transgourmet_Schweiz_AG/OpenShift/Deployment#etcd_backup_monitoring
 #
@@ -19,37 +18,8 @@ spec:
   groups:
   - name: cronjob-fail
     rules:
-    - expr: |
-        label_replace(
-          label_replace(
-            max(
-              kube_job_status_start_time
-              * ON(job_name,namespace) GROUP_RIGHT()
-              kube_job_owner{owner_name!=""}
-            )
-            BY (job_name, owner_name, namespace)
-            == ON(owner_name) GROUP_LEFT()
-            max(
-              kube_job_status_start_time
-              * ON(job_name,namespace) GROUP_RIGHT()
-              kube_job_owner{owner_name!=""}
-            )
-            BY (owner_name),
-          "job", "$1", "job_name", "(.+)"),
-        "cronjob", "$1", "owner_name", "(.+)")
-      record: job:kube_job_status_start_time:max
-    - expr: |
-        clamp_max(
-          job:kube_job_status_start_time:max,1)
-          * ON(job) GROUP_LEFT()
-          label_replace(
-            label_replace(
-              (kube_job_status_failed != 0),
-              "job", "$1", "job_name", "(.+)"),
-            "cronjob", "$1", "owner_name", "(.+)")
-      record: job:kube_job_status_failed:sum
     - alert: EtcdBackupCronJobStatusFailed
       expr: |
-        job:kube_job_status_failed:sum{namespace="etcd-backup"}
-        * ON(cronjob,namespace) GROUP_LEFT()
-        (kube_cronjob_spec_suspend == 0)
+        kube_job_status_succeeded{namespace="etcd-backup"} == 0
+      labels:
+        severity: critical
