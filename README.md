@@ -93,7 +93,7 @@ To easily deploy the solution a helm chart is available on upstream Adfinis char
 Before installing the chart, feel free to update the `values.yaml` file according to your needs.
 
 ```
-helm repo add adfinis https://chart.adfinis.com
+helm repo add adfinis https://charts.adfinis.com
 helm install etcd-backup adfinis/openshift-etcd-backup
 ```
 
