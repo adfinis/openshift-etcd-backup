@@ -52,6 +52,13 @@ elif [ "${OCP_BACKUP_EXPIRE_TYPE}" = "count" ]; then
   esac
 fi
 
+# use sudo
+if [ "${OCP_BACKUP_NFS_USER}"] != "" ]; then
+  SUDO_CMD="sudo -u $OCP_BACKUP_NFS_USER " 
+else
+  SUDO_CMD=""
+fi
+
 # make dirname and cleanup paths
 BACKUP_FOLDER="$( date "${OCP_BACKUP_DIRNAME}")" || { echo "Invalid backup.dirname" && exit 1; }
 BACKUP_PATH="$( realpath -m "${OCP_BACKUP_SUBDIR}/${BACKUP_FOLDER}" )"
@@ -60,19 +67,22 @@ BACKUP_ROOTPATH="$( realpath -m "/backup/${OCP_BACKUP_SUBDIR}" )"
 
 # make nescesary directorys
 mkdir -p "/host/var/tmp/etcd-backup"
-mkdir -p "${BACKUP_PATH_POD}"
+$SUDO_CMD mkdir -p "${BACKUP_PATH_POD}"
 
 # create backup to temporary location
 chroot /host /usr/local/bin/cluster-backup.sh /var/tmp/etcd-backup
 
+# make readable
+chmod -R o+rw /host/var/tmp/etcd-backup
+
 # move files to pvc and delete temporary files
-mv /host/var/tmp/etcd-backup/* "${BACKUP_PATH_POD}"
+$SUDO_CMD cp -r /host/var/tmp/etcd-backup/* "${BACKUP_PATH_POD}"
 rm -rv /host/var/tmp/etcd-backup
 
 # expire backup
 if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ]; then
-  find "${BACKUP_ROOTPATH}" -mindepth 1 -maxdepth 1  -type d -mtime "+${OCP_BACKUP_KEEP_DAYS}" -exec rm -rv {} +
+  $SUDO_CMD find "${BACKUP_ROOTPATH}" -mindepth 1 -maxdepth 1  -type d -mtime "+${OCP_BACKUP_KEEP_DAYS}" -exec $SUDO_CMD rm -rv {} +
 elif [ "${OCP_BACKUP_EXPIRE_TYPE}" = "count" ]; then
   # shellcheck disable=SC3040,SC2012
-  ls -1tp "${BACKUP_ROOTPATH}" | awk "NR>${OCP_BACKUP_KEEP_COUNT}" | xargs -I{} rm -rv "${BACKUP_ROOTPATH}/{}"
+  $SUDO_CMD ls -1tp "${BACKUP_ROOTPATH}" | awk "NR>${OCP_BACKUP_KEEP_COUNT}" | xargs -I{} $SUDO_CMD rm -rv "${BACKUP_ROOTPATH}/{}"
 fi

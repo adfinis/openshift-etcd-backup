@@ -69,6 +69,7 @@ The following options are used:
 - `OCP_BACKUP_KEEP_DAYS`: Days to keep the backup. Only used if `backup.expiretype` is set to `days`
 - `OCP_BACKUP_KEEP_COUNT`: Number of backups to keep. Only used if `backup.expiretype` is set to `count`
 - `OCP_BACKUP_UMASK`: Umask used inside the script to set restrictive permission on written files, as they contain sensitive information.
+- `OCP_BACKUP_NFS_USER`: User used if you cannot write to your NFS share as root. Make sure to include the user in your Dockerfile.
 
 Changing the schedule be done in the CronJob directly, with `spec.schedule`:
 ```
