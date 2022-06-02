@@ -4,7 +4,6 @@
 #
 # For detailed explanation on how it works, please see:
 # https://wiki.adfinis.com/adsy/index.php/RedHat/OpenShift_Container_Platform/BackupRestore/etcd-backup_4.7#Monitoring
-# https://wiki.adfinis.com/adsy/index.php/Transgourmet_Schweiz_AG/OpenShift/Deployment#etcd_backup_monitoring
 #
 # Apply with:
 # oc apply -n etcd-backup -f etcd-backup-cronjob-monitor.PrometheusRule.yaml
@@ -21,5 +20,6 @@ spec:
     - alert: EtcdBackupCronJobStatusFailed
       expr: |
         kube_job_status_succeeded{namespace="etcd-backup"} == 0
+      for: 24h
       labels:
         severity: critical
