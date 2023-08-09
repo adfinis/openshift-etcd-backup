@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8-minimal:8.8-860
+FROM registry.access.redhat.com/ubi8-minimal:8.8-1037
 
 LABEL org.opencontainers.image.authors="Adfinis AG <https://adfinis.com>"
 LABEL org.opencontainers.image.vendor="Adfinis"
