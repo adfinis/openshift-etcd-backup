@@ -127,4 +127,5 @@ If a commit does not contain a conventional commit style message you can fix
 it during the squash and merge operation on the PR.
 
 ## References
-* https://docs.openshift.com/container-platform/4.7/backup_and_restore/backing-up-etcd.html
+
+* https://docs.openshift.com/container-platform/latest/backup_and_restore/control_plane_backup_and_restore/backing-up-etcd.html
