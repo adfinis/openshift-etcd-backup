@@ -38,16 +38,16 @@ if [ "${OCP_BACKUP_S3}" = "true" ]; then
     # update CA trust
     update-ca-trust
 
-    # configure mc assuming the bucket already exists
+    # configure mcli assuming the bucket already exists
     bash +o history
-    mc alias set "${OCP_BACKUP_S3_NAME}" "${OCP_BACKUP_S3_HOST}" "${OCP_BACKUP_S3_ACCESS_KEY}" "${OCP_BACKUP_S3_SECRET_KEY}"
+    mcli alias set "${OCP_BACKUP_S3_NAME}" "${OCP_BACKUP_S3_HOST}" "${OCP_BACKUP_S3_ACCESS_KEY}" "${OCP_BACKUP_S3_SECRET_KEY}"
     bash -o history
 
     # create backup to temporary location
     chroot /host /usr/local/bin/cluster-backup.sh /var/tmp/etcd-backup
 
     # move files to S3 and delete temporary files
-    mc mv /host/var/tmp/etcd-backup/* "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
+    mcli mv /host/var/tmp/etcd-backup/* "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
     rm -rv /host/var/tmp/etcd-backup
 else
     # prepare, run and copy backup
