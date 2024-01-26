@@ -76,7 +76,7 @@ The following options are used:
 - `OCP_BACKUP_KEEP_COUNT`: Number of backups to keep. Only used if `backup.expiretype` is set to `count`
 - `OCP_BACKUP_UMASK`: Umask used inside the script to set restrictive permission on written files, as they contain sensitive information.
 
-Note that the storage type is exclusive. This means it is either S3 or PVC. In case of using S3 we do not manage the retention within the backup script. We suggest using a rentention policy on the S3 bucket itself.
+Note that the storage type is exclusive. This means it is either S3 or PVC. In case of using S3 we do not manage the retention within the backup script. We suggest using a rentention policy on the S3 bucket itself. This can be done thanks to an objects expiration configuration as described in the object lifecycle management [documentation](https://min.io/docs/minio/linux/administration/object-management/object-lifecycle-management.html#object-expiration).
 
 Changing the schedule be done in the CronJob directly, with `spec.schedule`:
 ```
