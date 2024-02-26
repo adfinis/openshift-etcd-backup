@@ -59,6 +59,12 @@ oc edit -n etcd-backup cm/backup-config
 ```
 
 The following options are used:
+- `OCP_BACKUP_S3`: Use S3 to store etcd-backup snapshots
+- `OCP_BACKUP_S3_NAME`: MinIO client host alias name
+- `OCP_BACKUP_S3_HOST`: S3 host endpoint (with scheme)
+- `OCP_BACKUP_S3_BUCKET`: S3 bucket name
+- `OCP_BACKUP_S3_ACCESS_KEY`: access key to access S3 bucket
+- `OCP_BACKUP_S3_SECRET_KEY`: secret key to access S3 bucket
 - `OCP_BACKUP_SUBDIR`: Sub directory on PVC that should be used to store the backup. If it does not exist it will be created.
 - `OCP_BACKUP_DIRNAME`: Directory name for a single backup. This is a format string used by
 [`date`](https://man7.org/linux/man-pages/man1/date.1.html)
@@ -69,6 +75,8 @@ The following options are used:
 - `OCP_BACKUP_KEEP_DAYS`: Days to keep the backup. Only used if `backup.expiretype` is set to `days`
 - `OCP_BACKUP_KEEP_COUNT`: Number of backups to keep. Only used if `backup.expiretype` is set to `count`
 - `OCP_BACKUP_UMASK`: Umask used inside the script to set restrictive permission on written files, as they contain sensitive information.
+
+Note that the storage type is exclusive. This means it is either S3 or PVC. In case of using S3 we do not manage the retention within the backup script. We suggest using a rentention policy on the S3 bucket itself. This can be done thanks to an objects expiration configuration as described in the object lifecycle management [documentation](https://min.io/docs/minio/linux/administration/object-management/object-lifecycle-management.html#object-expiration).
 
 Changing the schedule be done in the CronJob directly, with `spec.schedule`:
 ```
