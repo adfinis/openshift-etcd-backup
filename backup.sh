@@ -43,6 +43,13 @@ if [ "${OCP_BACKUP_S3}" = "true" ]; then
     mcli alias set "${OCP_BACKUP_S3_NAME}" "${OCP_BACKUP_S3_HOST}" "${OCP_BACKUP_S3_ACCESS_KEY}" "${OCP_BACKUP_S3_SECRET_KEY}"
     bash -o history
 
+    # make dirname
+    BACKUP_FOLDER="$( date "${OCP_BACKUP_DIRNAME}")" || { echo "Invalid backup.dirname" && exit 1; }
+    BACKUP_PATH="$( realpath -m "${OCP_BACKUP_SUBDIR}/${BACKUP_FOLDER}" )"
+
+    # make necessary directory
+    mkdir -p "/host/var/tmp/etcd-backup"
+
     # create backup to temporary location
     chroot /host /usr/local/bin/cluster-backup.sh /var/tmp/etcd-backup
 
