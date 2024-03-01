@@ -31,6 +31,8 @@
 
 set -xeuo pipefail
 
+OCP_BACKUP_S3="false"
+
 # check storage type
 if [ "${OCP_BACKUP_S3}" = "true" ]; then
     # prepare & push backup to S3
