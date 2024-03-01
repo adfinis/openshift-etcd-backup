@@ -31,7 +31,7 @@
 
 set -xeuo pipefail
 
-OCP_BACKUP_S3="false"
+OCP_BACKUP_S3=""
 
 # check storage type
 if [ "${OCP_BACKUP_S3}" = "true" ]; then
