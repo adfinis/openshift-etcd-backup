@@ -31,8 +31,6 @@
 
 set -xeuo pipefail
 
-OCP_BACKUP_S3=""
-
 # check storage type
 if [ "${OCP_BACKUP_S3}" = "true" ]; then
     # prepare & push backup to S3
@@ -47,13 +45,12 @@ if [ "${OCP_BACKUP_S3}" = "true" ]; then
 
     # make dirname
     BACKUP_FOLDER="$( date "${OCP_BACKUP_DIRNAME}")" || { echo "Invalid backup.dirname" && exit 1; }
-    BACKUP_PATH="$( realpath -m "${OCP_BACKUP_SUBDIR}/${BACKUP_FOLDER}" )"
 
     # make necessary directory
-    mkdir -p "/host/var/tmp/etcd-backup"
+    mkdir -p "/host/var/tmp/etcd-backup/${BACKUP_FOLDER}"
 
     # create backup to temporary location
-    chroot /host /usr/local/bin/cluster-backup.sh /var/tmp/etcd-backup
+    chroot /host /usr/local/bin/cluster-backup.sh "/var/tmp/etcd-backup/${BACKUP_FOLDER}"
 
     # move files to S3 and delete temporary files
     mcli mv /host/var/tmp/etcd-backup/* "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
