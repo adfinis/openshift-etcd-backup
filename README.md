@@ -62,7 +62,7 @@ The following options are used:
 - `OCP_BACKUP_S3`: Use S3 to store etcd-backup snapshots
 - `OCP_BACKUP_S3_NAME`: MinIO client host alias name
 - `OCP_BACKUP_S3_HOST`: S3 host endpoint (with scheme)
-- `OCP_BACKUP-S3_CA`: S3 host CA (if needed)
+- `OCP_BACKUP_S3_CA`: S3 host CA (if needed)
 - `OCP_BACKUP_S3_BUCKET`: S3 bucket name
 - `OCP_BACKUP_S3_ACCESS_KEY`: access key to access S3 bucket
 - `OCP_BACKUP_S3_SECRET_KEY`: secret key to access S3 bucket
