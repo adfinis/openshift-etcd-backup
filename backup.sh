@@ -35,11 +35,8 @@ set -xeuo pipefail
 if [ "${OCP_BACKUP_S3}" = "true" ]; then
     # prepare & push backup to S3
 
-    # add custom CA if any and update CA trust
-    if [ "${OCP_BACKUP_S3_CA}" ]; then
-        echo -n "${OCP_BACKUP_S3_CA}" > /etc/pki/ca-trust/source/anchors/ca.crt
-        update-ca-trust
-    fi
+    # update CA trust
+    update-ca-trust
 
     # configure mcli assuming the bucket already exists
     bash +o history

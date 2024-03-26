@@ -53,3 +53,9 @@ spec:
           - name: volume-backup
             persistentVolumeClaim:
               claimName: etcd-backup-pvc
+          - name: custom-ca
+            configMap:
+              name: backup-config
+              items:
+              - key: OCP_BACKUP_S3_CA
+                path: /etc/pki/ca-trust/source/anchors/ca.crt
