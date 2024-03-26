@@ -6,6 +6,10 @@ data:
   OCP_BACKUP_S3: "false"
   OCP_BACKUP_S3_NAME: "minio"
   OCP_BACKUP_S3_HOST: "http://minio.local:9000"
+  OCP_BACKUP_S3_CA: |
+        -----BEGIN CERTIFICATE-----
+        ...
+        -----END CERTIFICATE-----
   OCP_BACKUP_S3_BUCKET: "etcd-backup"
   OCP_BACKUP_S3_ACCESS_KEY: "randomaccesskey"
   OCP_BACKUP_S3_SECRET_KEY: "secretkey"
