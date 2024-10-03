@@ -6,7 +6,7 @@ updates:
     schedule:
       interval: "daily"
     commit-message:
-      prefix: "feat: "
+      prefix: "fix: "
 
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
