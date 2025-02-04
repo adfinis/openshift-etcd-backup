@@ -35,6 +35,20 @@ set -xeuo pipefail
 if [ "${OCP_BACKUP_S3}" = "true" ]; then
     # prepare & push backup to S3
 
+    # Validate expire type
+    case "${OCP_BACKUP_EXPIRE_TYPE}" in
+        days|never) ;;
+        *) echo "backup.expiretype needs to be one of: days,never"; exit 1 ;;
+    esac
+
+        # validate expire numbers
+    if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ]; then
+        case "${OCP_BACKUP_KEEP_DAYS}" in
+            ''|*[!0-9]*) echo "backup.expiredays needs to be a valid number"; exit 1 ;;
+            *) ;;
+        esac
+    fi
+
     # update CA trust
     update-ca-trust
 
@@ -55,6 +69,32 @@ if [ "${OCP_BACKUP_S3}" = "true" ]; then
     # move files to S3 and delete temporary files
     mcli mv -r /host/var/tmp/etcd-backup/* "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
     rm -rv /host/var/tmp/etcd-backup
+
+    # expire backup
+    rules_list=$(mc ilm rule list local/etcd-bucket --json | jq -c '.')
+    is_empty=$(echo $rules_list | jq -r 'if .status == "error" then "true" else "false" end')
+
+    if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "never" ] && [ "$is_empty" = "false" ]; then
+        for rule_id in $(echo $rules_list | jq -r '.config.Rules[].ID'); do
+            echo "OCP_BACKUP_EXPIRE_TYPE is set to 'never'. Deleting rule with ID ${rule_id}..."
+            mc ilm rule rm --id $rule_id local/etcd-bucket
+        done
+    fi
+
+    if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ] && [ "$is_empty" = "false" ]; then
+        for rule_id in $(echo $rules_list | jq -r '.config.Rules[] | select(.Expiration) | .ID'); do
+            days=$(echo $rules_list | jq -r ".config.Rules[] | select(.ID == \"$rule_id\") | .Expiration.Days")
+            if [ "$days" -ne "$OCP_BACKUP_KEEP_DAYS" ]; then
+                echo "Rule id ${rule_id} does not match the OCP_BACKUP_KEEP_DAYS of ${OCP_BACKUP_KEEP_DAYS} days. Editing the rule..."
+                mc ilm rule edit --id $rule_id --expire-days $OCP_BACKUP_KEEP_DAYS local/etcd-bucket
+            fi
+        done
+    fi
+
+    if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ] && [ "$is_empty" = "true" ]; then
+        echo "Adding new rule to keep backup for ${OCP_BACKUP_KEEP_DAYS} days"
+        mc ilm rule add --expire-days $OCP_BACKUP_KEEP_DAYS local/etcd-bucket
+    fi
 else
     # prepare, run and copy backup
 
