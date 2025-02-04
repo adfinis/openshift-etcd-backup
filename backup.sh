@@ -71,7 +71,7 @@ if [ "${OCP_BACKUP_S3}" = "true" ]; then
     rm -rv /host/var/tmp/etcd-backup
 
     # expire backup
-    rules_list=$(mc ilm rule list local/etcd-bucket --json | jq -c '.')
+    rules_list=$(mc ilm rule list local/etcd-bucket --json)
     is_empty=$(echo $rules_list | jq -r 'if .status == "error" then "true" else "false" end')
 
     if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "never" ] && [ "$is_empty" = "false" ]; then
