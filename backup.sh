@@ -41,7 +41,7 @@ if [ "${OCP_BACKUP_S3}" = "true" ]; then
         *) echo "backup.expiretype needs to be one of: days,never"; exit 1 ;;
     esac
 
-        # validate expire numbers
+    # validate expire numbers
     if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ]; then
         case "${OCP_BACKUP_KEEP_DAYS}" in
             ''|*[!0-9]*) echo "backup.expiredays needs to be a valid number"; exit 1 ;;
