@@ -71,13 +71,13 @@ if [ "${OCP_BACKUP_S3}" = "true" ]; then
     rm -rv /host/var/tmp/etcd-backup
 
     # expire backup
-    rules_list=$(mc ilm rule list "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}" --json)
+    rules_list=$(mcli ilm rule list "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}" --json || true)
     is_empty=$(echo "${rules_list}" | jq -r "if .status == \"error\" then \"true\" else \"false\" end")
 
     if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "never" ] && [ "$is_empty" = "false" ]; then
         for rule_id in $(echo "${rules_list}" | jq -r ".config.Rules[].ID"); do
             echo "OCP_BACKUP_EXPIRE_TYPE is set to \"never\". Deleting rule with ID ${rule_id}..."
-            mc ilm rule rm --id "${rule_id}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
+            mcli ilm rule rm --id "${rule_id}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
         done
     fi
 
@@ -86,14 +86,14 @@ if [ "${OCP_BACKUP_S3}" = "true" ]; then
             days=$(echo "${rules_list}" | jq -r ".config.Rules[] | select(.ID == \"${rule_id}\") | .Expiration.Days")
             if [ "$days" -ne "$OCP_BACKUP_KEEP_DAYS" ]; then
                 echo "Rule id ${rule_id} does not match the OCP_BACKUP_KEEP_DAYS of ${OCP_BACKUP_KEEP_DAYS} days. Editing the rule..."
-                mc ilm rule edit --id "${rule_id}" --expire-days "${OCP_BACKUP_KEEP_DAYS}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
+                mcli ilm rule edit --id "${rule_id}" --expire-days "${OCP_BACKUP_KEEP_DAYS}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
             fi
         done
     fi
 
     if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ] && [ "$is_empty" = "true" ]; then
         echo "Adding new rule to keep backup for ${OCP_BACKUP_KEEP_DAYS} days"
-        mc ilm rule add --expire-days "${OCP_BACKUP_KEEP_DAYS}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
+        mcli ilm rule add --expire-days "${OCP_BACKUP_KEEP_DAYS}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
     fi
 else
     # prepare, run and copy backup
