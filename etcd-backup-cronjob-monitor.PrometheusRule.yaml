@@ -3,8 +3,7 @@
 # This PrometheusRule alerts if a etcd-backup job has failed or was not scheduled.
 #
 # For detailed explanation on how it works, please see:
-# https://wiki.adfinis.com/adsy/index.php/RedHat/OpenShift_Container_Platform/BackupRestore/etcd-backup_4.7#Monitoring
-# https://wiki.adfinis.com/adsy/index.php/Transgourmet_Schweiz_AG/OpenShift/Deployment#etcd_backup_monitoring
+# https://wiki.adfinis.com/adfinis/index.php/Red_Hat_OpenShift_Container_Platform/Backup_Restore/etcd-backup_4.7#Monitoring
 #
 # Apply with:
 # oc apply -n etcd-backup -f etcd-backup-cronjob-monitor.PrometheusRule.yaml
