@@ -1,3 +1,4 @@
+---
 # runs on each push to main and is responsible for creating new tags/releases
 name: Create Semantic Release
 
