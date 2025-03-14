@@ -37,8 +37,8 @@ if [ "${OCP_BACKUP_S3}" = "true" ]; then
 
     # Validate expire type
     case "${OCP_BACKUP_EXPIRE_TYPE}" in
-        days|never) ;;
-        *) echo "backup.expiretype needs to be one of: days,never"; exit 1 ;;
+      ''|days|never) ;;
+      *) echo "backup.expiretype needs to be one of: days,never"; exit 1 ;;
     esac
 
     # validate expire numbers
@@ -70,30 +70,34 @@ if [ "${OCP_BACKUP_S3}" = "true" ]; then
     mcli mv -r /host/var/tmp/etcd-backup/* "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
     rm -rv /host/var/tmp/etcd-backup
 
-    # expire backup
-    rules_list=$(mcli ilm rule list "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}" --json || true)
-    is_empty=$(echo "${rules_list}" | jq -r "if .status == \"error\" then \"true\" else \"false\" end")
+    if [ -z "${OCP_BACKUP_EXPIRE_TYPE}" ]; then
+        echo "OCP_BACKUP_EXPIRE_TYPE is not set. Skiping s3 policies..."
+    else
+      # expire backup
+      rules_list=$(mcli ilm rule list "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}" --json || true)
+      is_empty=$(echo "${rules_list}" | jq -r "if .status == \"error\" then \"true\" else \"false\" end")
 
-    if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "never" ] && [ "$is_empty" = "false" ]; then
-        for rule_id in $(echo "${rules_list}" | jq -r ".config.Rules[].ID"); do
-            echo "OCP_BACKUP_EXPIRE_TYPE is set to \"never\". Deleting rule with ID ${rule_id}..."
-            mcli ilm rule rm --id "${rule_id}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
-        done
-    fi
+      if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "never" ] && [ "$is_empty" = "false" ]; then
+          for rule_id in $(echo "${rules_list}" | jq -r ".config.Rules[].ID"); do
+              echo "OCP_BACKUP_EXPIRE_TYPE is set to \"never\". Deleting rule with ID ${rule_id}..."
+              mcli ilm rule rm --id "${rule_id}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
+          done
+      fi
 
-    if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ] && [ "${is_empty}" = "false" ]; then
-        for rule_id in $(echo "${rules_list}" | jq -r ".config.Rules[] | select(.Expiration) | .ID"); do
-            days=$(echo "${rules_list}" | jq -r ".config.Rules[] | select(.ID == \"${rule_id}\") | .Expiration.Days")
-            if [ "$days" -ne "$OCP_BACKUP_KEEP_DAYS" ]; then
-                echo "Rule id ${rule_id} does not match the OCP_BACKUP_KEEP_DAYS of ${OCP_BACKUP_KEEP_DAYS} days. Editing the rule..."
-                mcli ilm rule edit --id "${rule_id}" --expire-days "${OCP_BACKUP_KEEP_DAYS}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
-            fi
-        done
-    fi
+      if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ] && [ "${is_empty}" = "false" ]; then
+          for rule_id in $(echo "${rules_list}" | jq -r ".config.Rules[] | select(.Expiration) | .ID"); do
+              days=$(echo "${rules_list}" | jq -r ".config.Rules[] | select(.ID == \"${rule_id}\") | .Expiration.Days")
+              if [ "$days" -ne "$OCP_BACKUP_KEEP_DAYS" ]; then
+                  echo "Rule id ${rule_id} does not match the OCP_BACKUP_KEEP_DAYS of ${OCP_BACKUP_KEEP_DAYS} days. Editing the rule..."
+                  mcli ilm rule edit --id "${rule_id}" --expire-days "${OCP_BACKUP_KEEP_DAYS}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
+              fi
+          done
+      fi
 
-    if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ] && [ "$is_empty" = "true" ]; then
-        echo "Adding new rule to keep backup for ${OCP_BACKUP_KEEP_DAYS} days"
-        mcli ilm rule add --expire-days "${OCP_BACKUP_KEEP_DAYS}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
+      if [ "${OCP_BACKUP_EXPIRE_TYPE}" = "days" ] && [ "$is_empty" = "true" ]; then
+          echo "Adding new rule to keep backup for ${OCP_BACKUP_KEEP_DAYS} days"
+          mcli ilm rule add --expire-days "${OCP_BACKUP_KEEP_DAYS}" "${OCP_BACKUP_S3_NAME}"/"${OCP_BACKUP_S3_BUCKET}"
+      fi
     fi
 else
     # prepare, run and copy backup
