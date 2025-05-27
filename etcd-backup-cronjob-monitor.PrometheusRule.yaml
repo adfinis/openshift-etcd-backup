@@ -3,7 +3,7 @@
 # This PrometheusRule alerts if a etcd-backup job has failed or was not scheduled.
 #
 # For detailed explanation on how it works, please see:
-# https://wiki.adfinis.com/adfinis/index.php/Red_Hat_OpenShift_Container_Platform/Backup_Restore/etcd-backup_4.7#Monitoring
+# https://wiki.adfinis.com/adfinis/index.php/Red_Hat_OpenShift_Container_Platform/Backup_Restore
 #
 # Apply with:
 # oc apply -n etcd-backup -f etcd-backup-cronjob-monitor.PrometheusRule.yaml
@@ -19,6 +19,6 @@ spec:
     rules:
     - alert: EtcdBackupCronJobStatusFailed
       expr: |
-        kube_job_status_succeeded{namespace="etcd-backup"} == 0
+        kube_job_status_failed{namespace="etcd-backup"} > 0
       labels:
         severity: critical
