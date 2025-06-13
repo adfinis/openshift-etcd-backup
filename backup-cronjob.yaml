@@ -53,3 +53,4 @@ spec:
           - name: volume-backup
             persistentVolumeClaim:
               claimName: etcd-backup-pvc
+          dnsPolicy: ClusterFirstWithHostNet
